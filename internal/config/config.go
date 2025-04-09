@@ -29,14 +29,30 @@ type APIConfig struct {
 	IdleTimeout  time.Duration `mapstructure:"idle_timeout" validate:"required"`
 }
 
+type DatastoreEngine string
+
+const (
+	Postgres DatastoreEngine = "postgresql"
+)
+
+type DatastoreConfig struct {
+	Engine          DatastoreEngine `mapstructure:"engine" validate:"required,oneof=postgresql"`
+	URI             string          `mapstructure:"uri" validate:"required"`
+	MaxOpenConns    int             `mapstructure:"max_open_conns" validate:"required,min=1"`
+	MaxIdleConns    int             `mapstructure:"max_idle_conns" validate:"required,min=1"`
+	ConnMaxLifetime time.Duration   `mapstructure:"conn_max_lifetime" validate:"required"`
+	GCWindow        time.Duration   `mapstructure:"gc_window" validate:"required"`
+}
+
 // SpiceDBConfig represents the SpiceDB connection configuration
 type SpiceDBConfig struct {
-	Host           string        `mapstructure:"host" validate:"required"`
-	Port           uint16        `mapstructure:"port" validate:"required,min=1,max=65535"`
-	PresharedKey   string        `mapstructure:"preshared_key" validate:"required"`
-	MaxRetries     int           `mapstructure:"max_retries" validate:"required,min=1"`
-	RetryDelay     time.Duration `mapstructure:"retry_delay" validate:"required"`
-	RequestTimeout time.Duration `mapstructure:"request_timeout" validate:"required"`
+	Host           string           `mapstructure:"host" validate:"required"`
+	Port           uint16           `mapstructure:"port" validate:"required,min=1,max=65535"`
+	PresharedKey   string           `mapstructure:"preshared_key" validate:"required"`
+	MaxRetries     int              `mapstructure:"max_retries" validate:"required,min=1"`
+	RetryDelay     time.Duration    `mapstructure:"retry_delay" validate:"required"`
+	RequestTimeout time.Duration    `mapstructure:"request_timeout" validate:"required"`
+	Datastore      *DatastoreConfig `mapstructure:"datastore" validate:"required"`
 }
 
 // MetricsConfig represents the metrics configuration
@@ -120,6 +136,12 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("spicedb.max_retries", 3)
 	v.SetDefault("spicedb.retry_delay", "1s")
 	v.SetDefault("spicedb.request_timeout", "5s")
+	// SpiceDB datastore defaults
+	v.SetDefault("spicedb.datastore.engine", "postgresql")
+	v.SetDefault("spicedb.datastore.max_open_conns", 20)
+	v.SetDefault("spicedb.datastore.max_idle_conns", 10)
+	v.SetDefault("spicedb.datastore.conn_max_lifetime", "30m")
+	v.SetDefault("spicedb.datastore.gc_window", "24h")
 
 	// Metrics defaults
 	v.SetDefault("metrics.enabled", true)

@@ -12,6 +12,14 @@ spicedb:
   max_retries: 3
   retry_delay: "1s"
   request_timeout: "5s"
+  datastore:
+    engine: "postgresql"
+    # uri: "postgres://user:password@localhost:5432/spicedb"
+    uri: "postgres://postgres:postgres@localhost:5432/spicedb-poc"
+    max_open_conns: 20
+    max_idle_conns: 10
+    conn_max_lifetime: "30m"
+    gc_window: "24h"
 
 metrics:
   enabled: true
