@@ -1,0 +1,23 @@
+api:
+  http_port: 8085
+  grpc_port: 8086
+  read_timeout: "5s"
+  write_timeout: "5s"
+  idle_timeout: "120s"
+
+spicedb:
+  host: "localhost"
+  port: 50051
+  preshared_key: "your_preshared_key_here"
+  max_retries: 3
+  retry_delay: "1s"
+  request_timeout: "5s"
+
+metrics:
+  enabled: true
+  port: 9093
+  path: "/metrics"
+
+logging:
+  level: "info"
+  format: "json"

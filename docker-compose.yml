@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  spicedb-migrate:
+    image: authzed/spicedb:v1.41.0
+    environment:
+      - SPICEDB_DATASTORE_ENGINE=cockroachdb
+      - SPICEDB_DATASTORE_CONN_URI=postgresql://root@cockroachdb:26257/spicedb?sslmode=disable
+      - SPICEDB_LOG_LEVEL=debug
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    command: migrate head
+
+  spicedb:
+    image: authzed/spicedb:v1.41.0
+    ports:
+      - "50051:50051"  # gRPC
+      - "8443:8443"    # HTTP
+    environment:
+      - SPICEDB_DATASTORE_ENGINE=cockroachdb
+      - SPICEDB_DATASTORE_CONN_URI=postgresql://root@cockroachdb:26257/spicedb?sslmode=disable
+      - SPICEDB_GRPC_PRESHARED_KEY=development
+      - SPICEDB_API_TOKEN=development
+      - SPICEDB_LOG_LEVEL=debug
+      - SPICEDB_HTTP_ENABLED=true
+    depends_on:
+      spicedb-migrate:
+        condition: service_completed_successfully
+      cockroachdb:
+        condition: service_healthy
+    volumes:
+      - ./schema:/schema
+    command: serve --grpc-preshared-key=development
+
+  cockroachdb:
+    image: cockroachdb/cockroach:v23.1.11
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    environment:
+      - COCKROACH_DATABASE=spicedb
+    volumes:
+      - cockroachdb-data:/cockroach/cockroach-data
+    command: start-single-node --insecure --store=path=/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "sql", "--insecure", "--execute=SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"  # HTTP
+      - "8086:8086"  # gRPC
+    environment:
+      - CONFIG_FILE=default.yaml
+      - HTTP_PORT=8085
+      - GRPC_PORT=8086
+    depends_on:
+      spicedb:
+        condition: service_started
+      cockroachdb:
+        condition: service_healthy
+
+volumes:
+  cockroachdb-data: 

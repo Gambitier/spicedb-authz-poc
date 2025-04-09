@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[zed]": {
+    "editor.defaultFormatter": "authzed.spicedb-vscode"
+  },
+  "debug.console.wordWrap": false
+}

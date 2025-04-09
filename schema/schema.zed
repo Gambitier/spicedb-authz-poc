@@ -1,0 +1,8 @@
+definition user {}
+
+definition post {
+  relation reader: user
+  relation writer: user
+  permission read = reader + writer
+  permission write = writer
+}

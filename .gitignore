@@ -1,0 +1,22 @@
+# Environment specific configuration
+default.*.yaml
+
+# Binary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDE specific files
+.idea/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db 
+
+debug

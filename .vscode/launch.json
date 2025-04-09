@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Server",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/server/main.go",
+      "args": [
+        // relative path to the cmd/server/main.go file
+        "--config=../../default.yaml"
+      ],
+      "env": {
+        "env": "development"
+      },
+      "output": "debug",
+      "showLog": true,
+      "trace": "verbose"
+    }
+  ]
+}
