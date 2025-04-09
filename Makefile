@@ -17,6 +17,7 @@ clean: ## Remove build artifacts and stop services
 proto: ## Generate protobuf and gRPC code
 logs: ## Tail logs from all services
 migrate: ## Apply latest SpiceDB migrations
+migrate-docker: ## Apply latest SpiceDB migrations using Docker
 cockroach-shell: ## Open a CockroachDB SQL shell
 
 # Development commands
@@ -57,7 +58,11 @@ logs:
 	@echo "Showing logs..."
 	@docker-compose logs -f
 
-migrate:
+migrate: ## Apply latest SpiceDB migrations using Go migration tool
+	@echo "Applying SpiceDB migrations..."
+	@go run cmd/spicedb-migrate/main.go --config="default.yaml" --env=development
+
+migrate-docker:
 	@echo "Applying SpiceDB schema..."
 	@docker-compose exec spicedb spicedb migrate head
 
